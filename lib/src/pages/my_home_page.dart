@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_feed/src/models/user.dart';
+import 'package:my_feed/src/services/auth_service.dart';
 import 'package:my_feed/src/utils/constants.dart';
 import 'package:my_feed/src/widgets/custom_simple_dialog.dart';
 
@@ -56,9 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
         splashColor: Colors.blue,
         child: Text("Forgot password?"),
         onPressed: () {
-          _formKey.currentState.save();
-
-          showAlertDialog();
+          //todo
         },
       ),
     );
@@ -77,8 +76,16 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.white,
           ),
         ),
-        onPressed: () {
-          // todo
+        onPressed: () async {
+          _formKey.currentState.save();
+
+          final result = await AuthService().login(user);
+          if (result) {
+            // go to main page
+            showAlertDialog(title: "title", content: "login successfully");
+          } else {
+            showAlertDialog(title: "title", content: "login failure");
+          }
         },
       ),
     );
@@ -120,15 +127,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void showAlertDialog() {
+  void showAlertDialog({String title, String content}) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return CustomSimpleDialog(
-          title: "Title",
-          content: "${user.username}, ${user.password}",
-          onPress: (){
+          title: title,
+          content: content,
+          onPress: () {
             Navigator.pop(context);
           },
         );
