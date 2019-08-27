@@ -82,8 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           final result = await AuthService().login(user);
           if (result) {
-            // go to main page
-            showAlertDialog(title: "title", content: "login successfully");
+            Navigator.pushReplacementNamed(context, Constant.HOME_ROUTE);
           } else {
             showAlertDialog(title: "title", content: "login failure");
           }

@@ -327,3 +327,26 @@ class Person5 {
 
   Person5(this.fName, this.lName);
 }
+
+
+//
+//void main() {
+//  // https://api.dartlang.org/stable/2.1.0/dart-core/Error-class.html
+//  print("========== Exceptions =========");
+//
+//  try {
+//    int aa;
+//    aa++;
+//    //var xx = [1,2];
+//    //xx[40];
+//  } on NoSuchMethodError {
+//    print('NoSuchMethodError \n');
+//  } on RangeError {
+//    print('RangeError \n');
+//  } catch (e, s) {
+//    print('error: $e \n');
+//    print('stack: $s \n');
+//  } finally {
+//    print('finally \n');
+//  }
+//}
