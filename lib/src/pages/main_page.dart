@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:my_feed/src/models/youtube_response.dart';
-import 'package:my_feed/src/services/auth_service.dart';
-import 'package:my_feed/src/services/network_service.dart';
+import 'package:my_feed/src/services/index.dart';
 import 'package:my_feed/src/utils/constants.dart';
 import 'package:my_feed/src/widgets/custom_confirm_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -72,64 +72,79 @@ class _MainPageState extends State<MainPage> {
           }),
     );
   }
-}
 
-ListView buildListView(List<Youtube> data) {
-  return ListView.builder(
-    itemBuilder: (BuildContext context, int index) {
-      var item = data[index];
+  void _launchURL({String youtubeId}) async {
+    String url = 'https://www.youtube.com/watch?v=$youtubeId';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
-      return Card(
-        child: Column(
-          children: <Widget>[
-            ListTile(
-              title: Text(
-                item.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text(
-                item.subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+  ListView buildListView(List<Youtube> data) {
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) {
+        var item = data[index];
+
+        return Card(
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                contentPadding: EdgeInsets.all(8),
+                title: Text(
+                  item.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  item.subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
 //              leading: CircleAvatar(
 //                  backgroundImage: NetworkImage(
 //                      "https://mymodernmet.com/wp/wp-content/uploads/2019/07/russian-blue-cats-17.jpg")),
-              leading: CircleAvatar(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                      "https://mymodernmet.com/wp/wp-content/uploads/2019/07/russian-blue-cats-17.jpg"),
+                leading: CircleAvatar(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.network(item.avatarImage),
+                  ),
                 ),
               ),
-            ),
-            Image.network(
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-sg_Zy3KvCPLENEg6B5tsRS3K5vgPAM56V1tqZg5QdnNdEkpq4g",
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                FlatButton.icon(
-                  splashColor: Colors.blue,
-                  onPressed: () {},
-                  icon: Icon(Icons.thumb_up),
-                  label: Text("Like"),
+              GestureDetector(
+                onTap: () {
+                  _launchURL(youtubeId: item.id);
+                },
+                child: Image.network(
+                  item.youtubeImage,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
                 ),
-                FlatButton.icon(
-                  splashColor: Colors.blue,
-                  onPressed: () {},
-                  icon: Icon(Icons.share),
-                  label: Text("Shared"),
-                )
-              ],
-            )
-          ],
-        ),
-      );
-    },
-    itemCount: data.length,
-  );
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  FlatButton.icon(
+                    splashColor: Colors.blue,
+                    onPressed: () {},
+                    icon: Icon(Icons.thumb_up),
+                    label: Text("Like"),
+                  ),
+                  FlatButton.icon(
+                    splashColor: Colors.blue,
+                    onPressed: () {},
+                    icon: Icon(Icons.share),
+                    label: Text("Shared"),
+                  )
+                ],
+              )
+            ],
+          ),
+        );
+      },
+      itemCount: data.length,
+    );
+  }
 }
