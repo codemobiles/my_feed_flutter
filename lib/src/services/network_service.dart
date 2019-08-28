@@ -21,9 +21,10 @@ class NetworkService{
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
+     // final jsonResponse = json.decode(response.body);
+     // YoutubeResponse youtube = YoutubeResponse.fromJson(jsonResponse);
 
-      YoutubeResponse youtube = YoutubeResponse.fromJson(jsonResponse);
+      YoutubeResponse youtube = youtubeResponseFromJson(response.body);
 
 //      for (var item in youtube.youtubes) {
 //        print(item.title);

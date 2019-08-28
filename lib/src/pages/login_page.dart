@@ -4,12 +4,12 @@ import 'package:my_feed/src/services/auth_service.dart';
 import 'package:my_feed/src/utils/constants.dart';
 import 'package:my_feed/src/widgets/custom_simple_dialog.dart';
 
-class MyHomePage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _LoginPageState extends State<LoginPage> {
   User user;
 
   var _formKey = GlobalKey<FormState>();

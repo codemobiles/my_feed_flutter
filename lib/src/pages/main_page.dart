@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:my_feed/src/models/youtube_response.dart';
+import 'package:my_feed/src/services/auth_service.dart';
 import 'package:my_feed/src/services/network_service.dart';
+import 'package:my_feed/src/utils/constants.dart';
+import 'package:my_feed/src/widgets/custom_confirm_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -8,16 +12,14 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  var obj = {
-    'title': "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
-        " Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, "
-        "when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-        " It has survived not only five centuries, but also the leap into electronic typesetting,"
-        " remaining essentially unchanged. It was popularised in the 1960s with the release of "
-        "Letraset sheets containing Lorem Ipsum passages, and more recently "
-        "with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
-    'subtitle':
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum"
+  var dummyData = {
+    'title':
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+            " Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
+    'subtitle': "Lorem Ipsum is simply dummy text of the printing and typesetting industry. "
+        "Lorem Ipsum has been the industry's standard dummy text ever since the "
+        "1500s, when an unknown printer took a galley of type and scrambled it "
+        "to make a type specimen book. It has survived not only five centuries"
   };
 
   @override
@@ -31,19 +33,43 @@ class _MainPageState extends State<MainPage> {
           ),
           IconButton(
             icon: Icon(Icons.exit_to_app),
-            onPressed: () {},
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomConfirmDialog(
+                    title:
+                        "${prefs.getString(Constant.USERNAME_PREF)} to Logout",
+                    content: "Are you sure?",
+                    onPressOK: () async {
+                      await AuthService().logout();
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/login', (Route<dynamic> route) => false);
+                    },
+                    onPressCancel: () {
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              );
+            },
           )
         ],
       ),
       body: FutureBuilder<List<Youtube>>(
           future: NetworkService.fetchYoutubeGET(type: "superhero"),
           builder: (context, snapshot) {
-            if(snapshot.hasData) {
+            if (snapshot.hasData) {
               return buildListView(snapshot.data);
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(snapshot.error),
+              );
             }
-            return Text(snapshot.error);
-          }
-      ),
+            return CircularProgressIndicator();
+          }),
     );
   }
 }
@@ -51,7 +77,6 @@ class _MainPageState extends State<MainPage> {
 ListView buildListView(List<Youtube> data) {
   return ListView.builder(
     itemBuilder: (BuildContext context, int index) {
-
       var item = data[index];
 
       return Card(

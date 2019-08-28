@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:my_feed/src/pages/main_page.dart';
-import 'package:my_feed/src/pages/my_home_page.dart';
+import 'package:my_feed/src/pages/login_page.dart';
+import 'package:my_feed/src/services/auth_service.dart';
 import 'package:my_feed/src/themes/app_theme.dart';
 import 'package:my_feed/src/utils/constants.dart';
 
 class MyApp extends StatelessWidget {
-  var _route = <String, WidgetBuilder>{
-    Constant.LOGIN_ROUTE: (context) => MyHomePage(),
+  final _route = <String, WidgetBuilder>{
+    Constant.LOGIN_ROUTE: (context) => LoginPage(),
     Constant.HOME_ROUTE: (context) => MainPage()
   };
 
@@ -17,7 +18,20 @@ class MyApp extends StatelessWidget {
       routes: _route,
       title: Constant.APP_NAME,
       theme: appTheme(),
-      home: MyHomePage(),
+      home: FutureBuilder<bool>(
+        future: AuthService().isLogin(),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          if(snapshot.hasData){
+            if(snapshot.data == true){
+              return MainPage();
+            }
+            return LoginPage();
+          }else if(snapshot.hasError){
+            // todo
+          }
+          return LoginPage();
+        },
+      )
     );
   }
 }
